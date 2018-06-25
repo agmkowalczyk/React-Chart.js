@@ -3,7 +3,7 @@ import {Bar} from 'react-chartjs-2';
 import { Form, Col, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
 const testData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  xAxisLabels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
   categories: ['category-0', 'category-1', 'category-2', 'category-3', 'category-4', 'category-5'],
   data: [
     [51, 65, 40, 49, 60, 37, 40],
@@ -15,10 +15,10 @@ const testData = {
   ]
 }
 
-const Categories = ({ categories, handleChange }) => {
+const Categories = ({ categories, handleChange, label }) => {
   return (
-    <FormControl componentClass="select" placeholder="select" onChange={handleChange}>
-      { categories.map((el, idx) => <option key={el} value={idx}>{el}</option>) }
+    <FormControl componentClass="select" onChange={handleChange} value={label}>
+      { categories.map((el, idx) => <option key={el} value={el} id={idx}>{el}</option>) }
     </FormControl>
   )
 }
@@ -28,50 +28,62 @@ class MyChart extends React.Component {
     super(props);
     
     this.state = {
+      xAxisLabels: testData.xAxisLabels,
       categories: testData.categories,
-      data1: testData.data[0],
-      data2: testData.data[1],
-      label1: testData.categories[0],
-      label2: testData.categories[1]
+      data1: testData.data[2],
+      data2: testData.data[3],
+      label1: testData.categories[2],
+      label2: testData.categories[3]
     }
 
     this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange(e) {
-    this.setState({ [e.target.id]: testData.data[e.target.value] });
-    
+  setLabel(e) {
     // needs better idea
     if (e.target.id === 'data1')
-      this.setState({ label1: testData.categories[e.target.value] });
+      this.setState({ label1: e.target.value });
       else
-      this.setState({ label2: testData.categories[e.target.value] });
+      this.setState({ label2: e.target.value });
+  }
+
+  selectData(e) {
+    for (let elem of e.target.children) {
+      if (elem.value === e.target.value) {
+        this.setState({ [e.target.id]: testData.data[elem.id] });
+      }
+    }
+  }
+
+  handleChange(e) {
+    this.selectData(e);
+    this.setLabel(e);
   }
 
   render() {
     const data = {
-      labels: testData.labels,
+      labels: testData.xAxisLabels,
       datasets: [{
           label: this.state.label1,
-          type:'line',
           data: this.state.data1,
+          type:'line',
           fill: false,
-          borderColor: '#EC932F',
-          backgroundColor: '#EC932F',
-          pointBorderColor: '#EC932F',
-          pointBackgroundColor: '#EC932F',
-          pointHoverBackgroundColor: '#EC932F',
-          pointHoverBorderColor: '#EC932F',
+          borderColor: '#c0392b',
+          backgroundColor: '#c0392b',
+          pointBorderColor: '#c0392b',
+          pointBackgroundColor: '#c0392b',
+          pointHoverBackgroundColor: '#c0392b',
+          pointHoverBorderColor: '#c0392b',
           yAxisID: 'y-axis-2'
         },{
           type: 'bar',
           label: this.state.label2,
           data: this.state.data2,
           fill: false,
-          backgroundColor: '#71B37C',
-          borderColor: '#71B37C',
-          hoverBackgroundColor: '#71B37C',
-          hoverBorderColor: '#71B37C',
+          backgroundColor: '#d0dbe5',
+          borderColor: '#d0dbe5',
+          hoverBackgroundColor: '#d0dbe5',
+          hoverBorderColor: '#d0dbe5',
           yAxisID: 'y-axis-1'
         }]
     };
@@ -105,7 +117,7 @@ class MyChart extends React.Component {
             position: 'left',
             id: 'y-axis-1',
             gridLines: {
-              display: false
+              display: true
             },
             labels: {
               show: true
@@ -136,26 +148,19 @@ class MyChart extends React.Component {
 
     return (
       <div>
-        <h2>test data</h2>
-        <Form inline>
+        <h2>Performance monitor</h2>
+        <h4>Here is a subtitle for this table</h4>
+        <Form>
           <Col md={5}>
-            <FormGroup controlId="data1">
-              <Col componentClass={ControlLabel} md={5}>
-                Select 1
-              </Col>
-              <Col md={7}>
-                <Categories categories={this.state.categories} handleChange={this.handleChange} />
-              </Col>
+            <FormGroup controlId="data1" bsSize="small">
+              <ControlLabel>Select 1</ControlLabel>
+              <Categories categories={this.state.categories} handleChange={this.handleChange} label={this.state.label1} />
             </FormGroup>
           </Col>
           <Col md={5}>
-            <FormGroup controlId="data2">
-              <Col componentClass={ControlLabel} md={5}>
-                Select 2
-              </Col>
-              <Col md={7}>
-                <Categories categories={this.state.categories} handleChange={this.handleChange} />
-              </Col>
+            <FormGroup controlId="data2" bsSize="small">
+              <ControlLabel>Select 2</ControlLabel>
+              <Categories categories={this.state.categories} handleChange={this.handleChange} label={this.state.label2} />
             </FormGroup>
           </Col>
         </Form>
